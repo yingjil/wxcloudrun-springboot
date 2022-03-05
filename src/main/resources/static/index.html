@@ -58,6 +58,12 @@
         justify-content: center;
         flex-direction: column;
       }
+      .guess-input {
+        width: 126px;
+        padding-left: 6px;
+        box-sizing: border-box;
+        margin: 16px 8px;
+      }
     </style>
   </head>
 
@@ -85,6 +91,17 @@
             >清零</a
           >
         </div>
+
+        <p class="count-text">猜数字（0到100之间）</p>
+        <div style="display: flex; justify-content: center; margin-bottom: 80px">
+          <input type="number" id="GUESS_NUM" class="guess-input">
+          <a
+                  class="btn btn-outline-success btn-lg count-button"
+                  style="background: rgba(0,0,0,0.03); color: #07C160; border: 0;"
+                  onclick="guess()"
+          >提交</a>
+        </div>
+
         <small
           class="text-black-50"
           style="display: flex; justify-content: center; margin-bottom: 16px"
@@ -139,6 +156,24 @@
           $(".action-log").html(res.data);
         }
       });
+    }
+
+    function guess() {
+      var num = $('#GUESS_NUM').val();
+
+      $.ajax("/api/guess", {
+        method: "POST",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        data: JSON.stringify({
+          val: num,
+        }),
+      }).done(function (res) {
+        if (res && res.data !== undefined) {
+          alert(res.data);
+        }
+      });
+
     }
 
   </script>

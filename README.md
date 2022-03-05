@@ -101,6 +101,47 @@ curl https://<云托管服务域名>/api/count
 curl -X POST -H 'content-type: application/json' -d '{"action": "inc"}' https://<云托管服务域名>/api/count
 ```
 
+
+### `POST /api/guess`
+
+猜测数字
+
+#### 请求参数
+
+- `val`：`Integer` 类型，整形数字，猜测值
+
+##### 请求参数示例
+
+```
+{
+  "val": 50
+}
+```
+
+#### 响应结果
+
+- `code`：错误码
+- `data`：猜测结果，包括以下三种情况：
+-       'lower':表示低了
+-       'upper':表示高了
+-       'correct':表示正确
+
+##### 响应结果示例
+
+```json
+{
+  "code": 0,
+  "errorMsg": "",
+  "data": "lower"
+}
+```
+
+#### 调用示例
+
+```
+curl -X POST -H 'content-type: application/json' -d '{"val": 50}' https://<云托管服务域名>/api/guess
+```
+
 ## License
 
 [MIT](./LICENSE)

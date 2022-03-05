@@ -102,9 +102,45 @@ curl -X POST -H 'content-type: application/json' -d '{"action": "inc"}' https://
 ```
 
 
+
+
+
+### `GET /api/guess`
+
+猜数字（0~100）
+
+#### 请求参数
+
+val
+
+#### 响应结果
+
+- `code`：错误码
+- `data`：猜测结果，包括以下三种情况：
+-       'lower':表示低了
+-       'upper':表示高了
+-       'correct':表示正确
+
+##### 响应结果示例
+
+```json
+{
+  "code": 0,
+  "data": "lower"
+}
+```
+
+#### 调用示例
+
+```
+curl https://<云托管服务域名>/api/guess?val=50
+```
+
+
+
 ### `POST /api/guess`
 
-猜测数字
+猜测数字（0~100）
 
 #### 请求参数
 
@@ -131,7 +167,6 @@ curl -X POST -H 'content-type: application/json' -d '{"action": "inc"}' https://
 ```json
 {
   "code": 0,
-  "errorMsg": "",
   "data": "lower"
 }
 ```

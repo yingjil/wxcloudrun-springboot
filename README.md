@@ -111,7 +111,7 @@ curl -X POST -H 'content-type: application/json' -d '{"action": "inc"}' https://
 
 #### 请求参数
 
-val
+- `val`：`Integer` 类型，整形数字，猜测值
 
 #### 响应结果
 

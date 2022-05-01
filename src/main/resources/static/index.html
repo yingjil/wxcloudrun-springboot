@@ -346,6 +346,9 @@
                 alert(res.errorMsg)
                 return
             }
+            if(res.data == null || res.data == undefined || res.data.length==0){
+                alert("暂无车次信息!")
+            }
             $('#trainTicketBody').html('')
             var trainInfoList = []
             for (var i = 0; i < res.data.length; i++) {

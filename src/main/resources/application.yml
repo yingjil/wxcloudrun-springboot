@@ -3,6 +3,9 @@ server:
 
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 3MB
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
 #    url: jdbc:mysql://${MYSQL_ADDRESS}/${MYSQL_DATABASE:springboot_demo}

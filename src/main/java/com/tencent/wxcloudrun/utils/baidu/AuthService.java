@@ -1,6 +1,7 @@
 package com.tencent.wxcloudrun.utils.baidu;
 
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -12,6 +13,7 @@ import java.util.Map;
 /**
  * 获取token类
  */
+@Service
 public class AuthService {
 
     /**
@@ -22,7 +24,7 @@ public class AuthService {
      * "expires_in": 2592000
      * }
      */
-    public static String getAuth() {
+    public String getAuth() {
         // 官网获取的 API Key 更新为你注册的
         String clientId = "QUGpeOoO3915BstV9XXIFkHy";
         // 官网获取的 Secret Key 更新为你注册的
@@ -38,7 +40,7 @@ public class AuthService {
      * @return assess_token 示例：
      * "24.460da4889caad24cccdb1fea17221975.2592000.1491995545.282335-1234567"
      */
-    public static String getAuth(String ak, String sk) {
+    public String getAuth(String ak, String sk) {
         // 获取token地址
         String authHost = "https://aip.baidubce.com/oauth/2.0/token?";
         String getAccessTokenUrl = authHost
@@ -82,7 +84,8 @@ public class AuthService {
     }
 
     public static void main(String[] args) {
-        getAuth();
+        AuthService authService = new AuthService();
+        authService.getAuth();
     }
 
 }

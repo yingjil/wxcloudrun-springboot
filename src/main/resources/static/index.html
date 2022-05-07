@@ -44,6 +44,16 @@
         line-height: 40px;
         padding: 0 12px;
       }
+      .emotion-text {
+        width: 280px;
+        display: flex;
+        margin: 0 auto;
+        text-align: left;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        line-height: 40px;
+        padding: 0 12px;
+      }
       .quote {
         font-size: 12px;
       }
@@ -118,6 +128,19 @@
           >提交</a>
         </div>
 
+        <p class="count-text">上传图片识别情绪</p>
+        <div style="display: flex; justify-content: center; margin-bottom: 20px;margin-top: 20px">
+          <input style="width: 11vw" accept="image/*" type="file" id="uploadImg" onchange="btnUploadFile(event)" />
+        </div>
+        <div style="display: flex; justify-content: center; margin-bottom: 20px">
+          <textarea rows="5" id="emotionText" class="emotion-text"></textarea>
+        </div>
+        <div style="display: flex; justify-content: center; margin-bottom: 20px">
+          <img style="display: flex; justify-content: center; margin-bottom: 100px" src="img/123.jpg" alt="" class="img" id="showImg" />
+        </div>
+
+
+
         <small
           class="text-black-50"
           style="display: flex; justify-content: center; margin-bottom: 16px"
@@ -138,6 +161,9 @@
   ></script>
   <script>
     init();
+    $("#showImg").click(function(){
+      $("#uploadImg").click();
+    });
     function init() {
       $.ajax("/api/count", {
         method: "get",
@@ -204,6 +230,43 @@
       }).done(function (res) {
         if (res && res.data !== undefined) {
           alert(res.data);
+        }
+      });
+    }
+
+    function btnUploadFile(e){
+      //获取图片文件
+      var imgFile = e.target.files[0];
+      //后缀选取
+      if (!/\/(?:jpeg|jpg|png)/i.test(imgFile.type)){
+        console.log(图片格式不支持);
+        return;
+      }
+      //异步读取文件
+      var reader = new FileReader();
+      reader.onload = function(evt) {
+        //替换url
+        $("#showImg").attr("src",evt.target.result);
+      }
+      reader.readAsDataURL(imgFile);
+
+      var formData = new FormData();
+      formData.append("file", document.getElementById('uploadImg').files[0]);
+      $.ajax({
+        url: "/api/user/getEmotion",
+        async : false,
+        type: "POST",
+        data: formData,
+        dataType: "json",
+        processData : false,
+        contentType : false,
+        success: function(data) {
+          console.log("success");
+          console.log("data.data",data.data);
+          $("#emotionText").html(data.data);
+        },
+        error: function(xhr) {
+          console.log("error");
         }
       });
     }

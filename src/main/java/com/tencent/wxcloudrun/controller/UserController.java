@@ -1,27 +1,37 @@
 package com.tencent.wxcloudrun.controller;
 
 import com.tencent.wxcloudrun.config.ApiResponse;
-import com.tencent.wxcloudrun.dto.CounterRequest;
+import com.tencent.wxcloudrun.dto.FaceDetectResponse;
+import com.tencent.wxcloudrun.dto.FaceInfoRes;
 import com.tencent.wxcloudrun.dto.UserRequest;
-import com.tencent.wxcloudrun.model.Counter;
+import com.tencent.wxcloudrun.model.FaceInfo;
 import com.tencent.wxcloudrun.model.Userinfo;
-import com.tencent.wxcloudrun.service.CounterService;
+import com.tencent.wxcloudrun.service.FaceDetectService;
+import com.tencent.wxcloudrun.service.FaceInfoService;
 import com.tencent.wxcloudrun.service.UserinfoService;
-import com.tencent.wxcloudrun.utils.baidu.FaceDetect;
-import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
+import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * counter控制器
  */
 @RestController
-
 public class UserController {
+
+    @Resource
+    private FaceDetectService faceDetectService;
+    @Resource
+    private FaceInfoService faceInfoService;
 
     final UserinfoService userinfoService;
     final Logger logger;
@@ -60,19 +70,46 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "api/emotion")
+    @PostMapping(value = "/api/emotion")
     ApiResponse emotion(@RequestParam String id, @RequestParam String src) {
-
-        String emotion = FaceDetect.faceDetect(src);
+        String emotion = faceDetectService.getEmotionBySrc(src);
         if (null != emotion) {
             Userinfo userinfo = new Userinfo();
             userinfo.setId(id);
             userinfo.setEmotion(emotion);
-
             userinfoService.upsertUserEmotion(userinfo);
             return ApiResponse.ok(emotion);
         } else {
             return ApiResponse.error("您的头像可能没有表情");
+        }
+    }
+
+    @PostMapping(value = "/api/user/getEmotion")
+    ApiResponse getEmotion(MultipartFile file) {
+        try {
+            FaceDetectResponse faceDetectResponse = faceDetectService.getEmotionByFile(file);
+            //写db
+            if (null != faceDetectResponse) {
+                LocalDateTime now = LocalDateTime.now();
+                StringBuilder stringBuilder = new StringBuilder();
+                List<FaceInfoRes> faceList = faceDetectResponse.getResult().getFaceList();
+                faceList.stream().filter(FaceInfoRes::checkEmotion)
+                        .forEach(faceInfoRes -> {
+                            stringBuilder.append(",").append(faceInfoRes.getEmotion().getType());
+                            FaceInfo faceInfo = FaceInfo.builder()
+                                    .faceToken(faceInfoRes.getFaceToken())
+                                    .emotion(faceInfoRes.getEmotion().getType())
+                                    .createdAt(now)
+                                    .updatedAt(now)
+                                    .build();
+                            faceInfoService.insert(faceInfo);
+                        });
+                return ApiResponse.ok(stringBuilder.toString().replaceFirst(",", ""));
+            } else {
+                return ApiResponse.error("您的头像可能没有表情");
+            }
+        } catch (Exception e) {
+            return ApiResponse.error("获取表情失败：" + e.getMessage());
         }
     }
 

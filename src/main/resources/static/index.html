@@ -133,7 +133,7 @@
           <input style="width: 11vw" accept="image/*" type="file" id="uploadImg" onchange="btnUploadFile(event)" />
         </div>
         <div style="display: flex; justify-content: center; margin-bottom: 20px">
-          <textarea rows="5" id="emotionText" class="emotion-text"></textarea>
+          <textarea rows="5" id="emotionText" class="emotion-text" disabled></textarea>
         </div>
         <div style="display: flex; justify-content: center; margin-bottom: 20px">
           <img style="display: flex; justify-content: center; margin-bottom: 100px" src="img/123.jpg" alt="" class="img" id="showImg" />
@@ -161,9 +161,11 @@
   ></script>
   <script>
     init();
+
     $("#showImg").click(function(){
       $("#uploadImg").click();
     });
+
     function init() {
       $.ajax("/api/count", {
         method: "get",

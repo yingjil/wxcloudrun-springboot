@@ -15,7 +15,13 @@
       integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
       crossorigin="anonymous"
     />
-    <title>欢迎使用微信云托管</title>
+      <title>欢迎使用微信云托管</title>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+            integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
+            integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+      <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css">
     <style>
       .title-logo {
         height: 80px;
@@ -117,7 +123,52 @@
                   onclick="fiveele()"
           >提交</a>
         </div>
-
+          <div class="container ">
+              <h2 style="margin-bottom: 10px">火车票信息查询</h2>
+              <div class="row clearfix">
+                  <div class="col-md-12 column">
+                      <form role="form" class="form-inline " style="margin-bottom: 10px">
+                          <div class="form-group" style="margin-right: 20px" id="fromDiv">
+                              <label for="fromCity">出发城市</label><input type="text" class="form-control" id="fromCity" />
+<!--                                                                       onkeyup="this.value=this.value.replace(/[^\u4e00-\u9fa5]/g,'')"/>-->
+                          </div>
+                          <div class="form-group" style="margin-right: 20px" id="toDiv">
+                              <label for="toCity">到达城市</label><input type="text" class="form-control" id="toCity" />
+<!--                                                                     onkeyup="this.value=this.value.replace(/[^\u4e00-\u9fa5]/g,'')"/>-->
+                          </div>
+                          <div class="form-group date" style="margin-right: 20px" id="dateDiv">
+                              <label for="date">日期</label><input type="text" data-provide="datepicker" id="date" required
+                                                                 class="date"/>
+                          </div>
+                          <button type="button" class="btn btn-default btn-primary" onclick="queryTrainTicket()"
+                                  id="search">
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+                                  hidden="false" id="loading"></span>
+                              查询
+                          </button>
+                      </form>
+                      <div>
+                          <table id="trainTicketTable" class="table table-bordered table-hover">
+                              <thead>
+                              <th class="train-ticket-th">车次</th>
+                              <th class="train-ticket-th">出发站</th>
+                              <th class="train-ticket-th">出发时间</th>
+                              <th class="train-ticket-th">到达站</th>
+                              <th class="train-ticket-th">到达时间</th>
+                              <th class="train-ticket-th">运行时长</th>
+                              <th class="train-ticket-th">商务座价格</th>
+                              <th class="train-ticket-th">商务座剩余</th>
+                              <th class="train-ticket-th">一等座价格</th>
+                              <th class="train-ticket-th">一等座剩余</th>
+                              <th class="train-ticket-th">二等座价格</th>
+                              <th class="train-ticket-th">二等座剩余</th>
+                              </thead>
+                              <tbody id="trainTicketBody" data-spy="scroll"></tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
         <small
           class="text-black-50"
           style="display: flex; justify-content: center; margin-bottom: 16px"
@@ -130,12 +181,16 @@
       </div>
     </div>
   </body>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+          integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+          crossorigin="anonymous"></script>
   <script src="https://mat1.gtimg.com/www/asset/lib/jquery/jquery/jquery-1.11.1.min.js"></script>
   <script
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
     crossorigin="anonymous"
   ></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
   <script>
     init();
     function init() {
@@ -208,6 +263,114 @@
       });
     }
 
+    /**
+     * 日期格式化
+     * @param date
+     * @returns {string}
+     */
+    function dateFormat(date) {
+        var year = date.getFullYear()
+        var month = date.getMonth() + 1
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        var day = date.getDate()
+        if (day >= 0 && day <= 9) {
+            day = "0" + day;
+        }
+        return year + "-" + month + "-" + day
+    }
+
+    /**
+     * 在date基础上增加days天
+     * @param date
+     * @param days
+     * @returns {*}
+     */
+    function addDays(date, days) {
+        date.setDate(date.getDate() + days)
+        return date
+    }
+
+    /**
+     * 初始化日历选择器
+     * @type {string}
+     */
+    document.getElementById('date').value = dateFormat(new Date())
+    $('#date').datepicker({
+        format: "yyyy-mm-dd",
+        startDate: new Date(),
+        endDate: addDays(new Date(), 4),
+        autoclose: true,
+        language: 'zh-CN',
+    })
+
+    /**
+     * 查询数据
+     */
+    function queryTrainTicket() {
+        /**
+         * 校验参数
+         */
+        var from = $('#fromCity').val();
+        if (from == "" || from == null || from == undefined) {
+            $('#fromDiv').addClass("has-error")
+            return
+        } else {
+            $('#fromDiv').attr("class", "form-group")
+        }
+        var to = $('#toCity').val();
+        if (to == "" || to == null || to == undefined) {
+            $('#toDiv').addClass("has-error")
+            return
+        } else {
+            $('#toDiv').attr("class", "form-group")
+        }
+        var date = $('#date').val();
+        /**
+         * 开始异步请求
+         */
+        $('#loading').removeAttr("hidden")
+        $('#search').attr("disabled", "true")
+        $.ajax("/api/train/ticket?from=" + from + "&to=" + to + "&date=" + date, {
+            method: "GET",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json"
+        }).done(function (res) {
+            /**
+             * 处理结果
+             */
+            $('#loading').attr("hidden", "true")
+            $('#search').removeAttr("disabled")
+            if (res.code != 0) {
+                alert(res.errorMsg)
+                return
+            }
+            if(res.data == null || res.data == undefined || res.data.length==0){
+                alert("暂无车次信息!")
+            }
+            $('#trainTicketBody').html('')
+            var trainInfoList = []
+            for (var i = 0; i < res.data.length; i++) {
+                var train = res.data[i]
+                trainInfoList.push("<tr >")
+                trainInfoList.push("<td >" + train.trainNum + "</td>");
+                trainInfoList.push("<td >" + train.departStationName + "</td>");
+                trainInfoList.push("<td >" + train.departDepartTime + "</td>");
+                trainInfoList.push("<td >" + train.destStationName + "</td>");
+                trainInfoList.push("<td >" + train.destArriveTime + "</td>");
+                trainInfoList.push("<td >" + train.durationStr + "</td>");
+                trainInfoList.push("<td >" + train.businessSeatPrice + "</td>");
+                trainInfoList.push("<td >" + train.businessSeatLeft + "</td>");
+                trainInfoList.push("<td >" + train.firstSeatPrice + "</td>");
+                trainInfoList.push("<td >" + train.firstSeatLeft + "</td>");
+                trainInfoList.push("<td >" + train.secondSeatPrice + "</td>");
+                trainInfoList.push("<td >" + train.secondSeatLeft + "</td>");
+                trainInfoList.push("</tr>")
+            }
+            $('#trainTicketBody').append(trainInfoList.join(""))
+        });
+    }
 
   </script>
 </html>

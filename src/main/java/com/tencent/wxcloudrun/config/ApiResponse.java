@@ -1,5 +1,6 @@
 package com.tencent.wxcloudrun.config;
 
+import com.tencent.wxcloudrun.common.StatusType;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -16,7 +17,7 @@ public final class ApiResponse {
     this.errorMsg = errorMsg;
     this.data = data;
   }
-  
+
   public static ApiResponse ok() {
     return new ApiResponse(0, "", new HashMap<>());
   }
@@ -27,5 +28,8 @@ public final class ApiResponse {
 
   public static ApiResponse error(String errorMsg) {
     return new ApiResponse(0, errorMsg, new HashMap<>());
+  }
+  public static ApiResponse error(StatusType type) {
+      return new ApiResponse(type.getCode(), type.getMsg(), new HashMap<>());
   }
 }
